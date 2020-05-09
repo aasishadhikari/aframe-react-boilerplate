@@ -1,26 +1,113 @@
+import 'aframe';
+// import 'aframe-animation-component';
+// import 'aframe-particle-system-component';
+import { Entity, Scene } from 'aframe-react';
 import React, { Component } from 'react';
 import styles from './Index.scss';
 
 class Index extends Component {
-
-  render() {
-		return (
-				<div className={styles.root}>
-					<div className={styles.container}>
-						<div className={styles.heading}>
-							<h2>Sample Page</h2>
-						</div>
-						<div className={styles.content}>
-							<p>Lorem ipsum dolor sit amet, ex eum utinam consectetuer. Veniam quaeque facilisi eam ex, at mel labitur repudiare, id erat euismod vis. Has debet inimicus no, has ne eripuit mediocrem aliquando, ei sint delenit pri. Choro convenire deterruisset nec id, evertitur reprehendunt ea nec.</p>
-							<p>Volumus eligendi consequat mei in, elitr voluptua assueverit per ad, mucius philosophia vix ei. Eum ne labore gubergren reformidans, te vim verear legimus inimicus. At nec perpetua cotidieque. Ex everti aliquam mel. Est no deleniti tractatos adipiscing, at mei detraxit dissentiet. Eu audire quaeque eos, ei feugiat facilis sit, at duo mentitum offendit appareat.</p>
-							<p>Eu assum eruditi consequuntur usu. Nec eu tollit labore facilisis, dicunt iudicabit philosophia eam eu. Omnesque deleniti urbanitas ad pro, congue urbanitas intellegam id nam. No exerci expetenda sea. Ex dicam verterem gubergren qui.</p>
-							<p>Audire salutandi pro ne, veritus albucius ne per. Ea his simul omnes ocurreret, eu delectus partiendo persecuti eum. Case exerci utroque no per, eu vel delenit perpetua repudiare. Vim ex legere habemus, vix ne tempor detracto, ad sit veritus rationibus. Nec no regione convenire tractatos, an vide etiam voluptaria sea. Cu petentium complectitur eum.</p>
-						</div>
-					</div>
-				</div>
-		);
+  constructor(props) {
+    super(props);
+    this.state = { color: 'red' };
   }
 
+  changeColor() {
+    const colors = ['red', 'orange', 'yellow', 'green', 'blue'];
+    this.setState({
+      color: colors[Math.floor(Math.random() * colors.length)]
+    });
+  }
+
+  render() {
+    return (
+      <Scene>
+        <a-assets>
+          <img
+            id='groundTexture'
+            src='https://cdn.aframe.io/a-painter/images/floor.jpg'
+          />
+          <img
+            id='skyTexture'
+            src='https://cdn.aframe.io/a-painter/images/sky.jpg'
+          />
+        </a-assets>
+
+        <Entity
+          primitive='a-plane'
+          src='#groundTexture'
+          rotation='-90 0 0'
+          height='100'
+          width='100'
+        />
+        <Entity primitive='a-light' type='ambient' color='#445451' />
+        <Entity
+          primitive='a-light'
+          type='point'
+          intensity='2'
+          position='2 4 4'
+        />
+        <Entity
+          primitive='a-sky'
+          height='2048'
+          radius='30'
+          src='#skyTexture'
+          theta-length='90'
+          width='2048'
+        />
+        <Entity particle-system={{ preset: 'snow', particleCount: 2000 }} />
+        <Entity
+          text={{ value: 'Hello, A-Frame React!', align: 'center' }}
+          position={{ x: 0, y: 2, z: -1 }}
+        />
+
+        <Entity
+          id='box'
+          geometry={{ primitive: 'box' }}
+          material={{ color: this.state.color, opacity: 0.6 }}
+          animation__rotate={{
+            property: 'rotation',
+            dur: 2000,
+            loop: true,
+            to: '360 360 360'
+          }}
+          animation__scale={{
+            property: 'scale',
+            dir: 'alternate',
+            dur: 100,
+            loop: true,
+            to: '1.1 1.1 1.1'
+          }}
+          position={{ x: 0, y: 1, z: -3 }}
+          events={{ click: this.changeColor.bind(this) }}
+        >
+          <Entity
+            animation__scale={{
+              property: 'scale',
+              dir: 'alternate',
+              dur: 100,
+              loop: true,
+              to: '2 2 2'
+            }}
+            geometry={{ primitive: 'box', depth: 0.2, height: 0.2, width: 0.2 }}
+            material={{ color: '#24CAFF' }}
+          />
+        </Entity>
+
+        <Entity primitive='a-camera'>
+          <Entity
+            primitive='a-cursor'
+            animation__click={{
+              property: 'scale',
+              startEvents: 'click',
+              from: '0.1 0.1 0.1',
+              to: '1 1 1',
+              dur: 150
+            }}
+          />
+        </Entity>
+      </Scene>
+    );
+  }
 }
 
 export default Index;

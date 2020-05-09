@@ -11,7 +11,7 @@ html(lang="en")
 		link(type='text/css', rel='stylesheet', href='style.css')
 
 	body
-		#app!= content
+		#app(style='height:100%; width:100%')!= content
 
 		script.
 			window.__PRELOADED_STATE__ = !{state}
