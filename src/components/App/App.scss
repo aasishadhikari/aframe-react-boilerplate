@@ -1,4 +1,4 @@
-@import '../../../node_modules/normalize.css/normalize.css'; 
+@import '../../../node_modules/normalize.css/normalize.css';
 @import '../variables.scss';
 
 /*
@@ -110,11 +110,11 @@ textarea {
   }
 
   a[href]:after {
-    content: " (" attr(href) ")";
+    content: ' (' attr(href) ')';
   }
 
   abbr[title]:after {
-    content: " (" attr(title) ")";
+    content: ' (' attr(title) ')';
   }
 
   /*
@@ -122,9 +122,9 @@ textarea {
    * or use the `javascript:` pseudo protocol
    */
 
-  a[href^="#"]:after,
-  a[href^="javascript:"]:after {
-    content: "";
+  a[href^='#']:after,
+  a[href^='javascript:']:after {
+    content: '';
   }
 
   pre,
