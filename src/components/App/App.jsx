@@ -17,7 +17,6 @@ class App extends Component {
     const basePath = this.props.basePath || '/';
 
     return (
-      // <div className={styles.appBody}>
       <Switch>
         <Route exact path={basePath} component={Index} />
       </Switch>
