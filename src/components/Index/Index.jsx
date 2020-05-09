@@ -1,6 +1,5 @@
 import 'aframe';
-// import 'aframe-animation-component';
-// import 'aframe-particle-system-component';
+import 'aframe-particle-system-component';
 import { Entity, Scene } from 'aframe-react';
 import React, { Component } from 'react';
 import styles from './Index.scss';
