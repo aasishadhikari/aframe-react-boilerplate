@@ -5,12 +5,11 @@
 
 import { Entity } from 'aframe-react';
 import React from 'react';
-import skyImage from '../../assets/images/scenes/equirectangular.jpg';
 require('aframe-look-at-component');
 
 const Homepage = {
   name: 'homepage',
-  sky: skyImage,
+  sky: './assets/scenes/equirectangular.jpg',
   scene: () => (
     <Entity
       primitive='a-text'
