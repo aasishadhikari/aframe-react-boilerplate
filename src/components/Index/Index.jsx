@@ -3,107 +3,103 @@ import 'aframe-particle-system-component';
 import { Entity, Scene } from 'aframe-react';
 import React, { Component } from 'react';
 import styles from './Index.scss';
+import Camera from '../Camera';
+import Homepage from '../Scenes/Homepage';
 
 class Index extends Component {
   constructor(props) {
     super(props);
-    this.state = { color: 'red' };
+    this.state = {};
+    this.state.scenes = [Homepage];
+    this.state.initialScene = this.fetchSceneByName('homepage');
+    this.state.currentScene = this.fetchSceneByUrl();
   }
 
-  changeColor() {
-    const colors = ['red', 'orange', 'yellow', 'green', 'blue'];
+  /**
+   * When the window hash changes, adjust the current scene.
+   */
+  componentDidMount() {
+    window.onhashchange = () => this.switchCurrentScene(this.fetchSceneByUrl());
+  }
+
+  /**
+   * Fetches the scene object for the given scene ID.
+   *
+   * @param {string} name
+   *   String containing the name of the scene that should returned.
+   *
+   * @returns {object}
+   *   Object with scene data for the specified scene name.
+   */
+  fetchSceneByName(name) {
+    const newScene = this.state.scenes.find((scene) => scene.name === name);
+
+    // If no scene was found, return the 404 not found scene.
+    if (!newScene) {
+      return this.fetchSceneByName('no-match');
+    }
+    return newScene;
+  }
+
+  /**
+   * Fetches and return all the image tags needed by every scene.
+   *
+   * @returns {array}
+   *   Array of sky image tags.
+   */
+  fetchSkys() {
+    return this.state.scenes.map((scene) => (
+      <img key={scene.name} id={scene.name} src={scene.sky} />
+    ));
+  }
+
+  /**
+   * Fetches current scene based on URL
+   *
+   * @returns {object}
+   *   Object with scene data from the name specified in the URL, or 404 if no
+   *   scene is found.
+   */
+  fetchSceneByUrl() {
+    let name = window.location.hash.replace('#', '');
+
+    // If the name is empty, the initial scene should be returned.
+    if (name.length <= 0) {
+      name = this.state.initialScene.name;
+    }
+
+    const scene = this.fetchSceneByName(name);
+
+    // If this is a no-match scene, ensure no-match is in the url.
+    if (scene.name === 'no-match') {
+      window.location.hash = 'no-match';
+    }
+    return scene;
+  }
+  /**
+   * Switches the current scene to another scene.
+   *
+   * @param {object} scene
+   *   Scene object that should become the current scene.
+   */
+  switchCurrentScene(scene) {
     this.setState({
-      color: colors[Math.floor(Math.random() * colors.length)]
+      currentScene: scene
     });
   }
 
   render() {
     return (
-      <Scene>
-        <a-assets>
-          <img
-            id='groundTexture'
-            src='https://cdn.aframe.io/a-painter/images/floor.jpg'
-          />
-          <img
-            id='skyTexture'
-            src='https://cdn.aframe.io/a-painter/images/sky.jpg'
-          />
-        </a-assets>
-
-        <Entity
-          primitive='a-plane'
-          src='#groundTexture'
-          rotation='-90 0 0'
-          height='100'
-          width='100'
-        />
-        <Entity primitive='a-light' type='ambient' color='#445451' />
-        <Entity
-          primitive='a-light'
-          type='point'
-          intensity='2'
-          position='2 4 4'
-        />
+      <Scene inspector='https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js'>
+        <Entity laser-controls position={{ x: 0.3, y: -0.6, z: 0 }} />
+        <Entity primative='a-assets'>{this.fetchSkys()}</Entity>
         <Entity
           primitive='a-sky'
-          height='2048'
           radius='30'
-          src='#skyTexture'
-          theta-length='90'
-          width='2048'
+          src={`#${this.state.currentScene.name}`}
         />
-        <Entity particle-system={{ preset: 'snow', particleCount: 2000 }} />
-        <Entity
-          text={{ value: 'Hello, A-Frame React!', align: 'center' }}
-          position={{ x: 0, y: 2, z: -1 }}
-        />
-
-        <Entity
-          id='box'
-          geometry={{ primitive: 'box' }}
-          material={{ color: this.state.color, opacity: 0.6 }}
-          animation__rotate={{
-            property: 'rotation',
-            dur: 2000,
-            loop: true,
-            to: '360 360 360'
-          }}
-          animation__scale={{
-            property: 'scale',
-            dir: 'alternate',
-            dur: 100,
-            loop: true,
-            to: '1.1 1.1 1.1'
-          }}
-          position={{ x: 0, y: 1, z: -3 }}
-          events={{ click: this.changeColor.bind(this) }}
-        >
-          <Entity
-            animation__scale={{
-              property: 'scale',
-              dir: 'alternate',
-              dur: 100,
-              loop: true,
-              to: '2 2 2'
-            }}
-            geometry={{ primitive: 'box', depth: 0.2, height: 0.2, width: 0.2 }}
-            material={{ color: '#24CAFF' }}
-          />
-        </Entity>
-
-        <Entity primitive='a-camera'>
-          <Entity
-            primitive='a-cursor'
-            animation__click={{
-              property: 'scale',
-              startEvents: 'click',
-              from: '0.1 0.1 0.1',
-              to: '1 1 1',
-              dur: 150
-            }}
-          />
-        </Entity>
+        <Camera />
+        {this.state.currentScene.scene()}
       </Scene>
     );
   }
